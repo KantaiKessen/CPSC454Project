@@ -5,7 +5,7 @@ namespace BankApp
 {
     internal class Program
     {
-        const string versionNumber = "version 0.01 build 20241028";
+        const string versionNumber = "version 0.01 build 20241029";
         static void Main()
         {
             string input;
@@ -29,7 +29,10 @@ namespace BankApp
                         break;
 
                     case "3":
-
+                        dbconnect.GetCustomerByCustID(GetIntegerID());
+                        break;
+                    case "4":
+                        dbconnect.GetAccountByAccID(GetIntegerID());
                         break;
                     case "x":
                         {
@@ -60,6 +63,20 @@ namespace BankApp
             Console.WriteLine("8. Deposit");
             Console.WriteLine("9. Withdraw");
             Console.WriteLine("x. Exit");
+        }
+
+        static string GetIntegerID()
+        {
+            string input;
+            Console.Write("Please Enter ID");
+            input = Console.ReadLine().Trim().ToLower();
+            while (String.IsNullOrWhiteSpace(input) || !input.All(char.IsAsciiDigit))
+            {
+                Console.WriteLine("Bad input, please try again.");
+                Console.Write("Please Enter ID");
+                input = Console.ReadLine().Trim().ToLower();
+            }
+            return input;
         }
     }
 
