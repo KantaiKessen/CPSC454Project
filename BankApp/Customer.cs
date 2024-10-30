@@ -41,7 +41,7 @@ namespace BankApp
         public string ToInsertString()
         {
             return $"INSERT INTO customer(" +
-                $"ssn, forename, last_name, street_address, city, state, zip, zip_4) " +
+                $"ssn, forename, last_name, street_address, city, state, zip) " +
                 $"VALUES ('{SSN}','{Forename}','{Last_name}'," +
                 $"'{Street_address}','{City}','{State}','{ZIP}');";
         }

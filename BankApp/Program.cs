@@ -22,46 +22,32 @@ namespace BankApp
                     case "1":
                         Console.Clear();
                         dbconnect.GetCustomers();
-                        Console.WriteLine("Press any key to continue...");
-                        Console.ReadKey();
+                        KeyInterrupt();
                         break;
 
                     case "2":
                         Console.Clear();
                         dbconnect.GetAccounts();
-                        Console.WriteLine("Press any key to continue...");
-                        Console.ReadKey();
+                        KeyInterrupt();
                         break;
 
                     case "3":
                         Console.Clear();
                         dbconnect.GetCustomerByCustID(GetIntegerID());
-                        Console.WriteLine("Press any key to continue...");
-                        Console.ReadKey();
+                        KeyInterrupt();
                         break;
                     case "4":
                         Console.Clear();
                         dbconnect.GetAccountByAccID(GetIntegerID());
-                        Console.WriteLine("Press any key to continue...");
-                        Console.ReadKey();
+                        KeyInterrupt();
                         break;
                     case "5":
                         break;
                     case "6":
                         Customer newCustomer = MakeCustomer();
-                        Console.WriteLine("Command: Please confirm with Y");
-                        Console.WriteLine(newCustomer.ToInsertString());
-                        string confirmation = Console.ReadLine();
-                        if (confirmation == "y" || confirmation == "Y")
-                        {
-                            List<string> transactions = new List<string> { newCustomer.ToInsertString() };
-                            dbconnect.ExecuteSqlTransaction(transactions);
-                        }
-                        else
-                        {
-                            break;
-                        }
-                        
+                        List<string> transactions = new List<string> { newCustomer.ToInsertString() };
+                        dbconnect.ExecuteSqlTransaction(transactions);
+                        KeyInterrupt();
                         break;
                     case "7":
                         break;
@@ -105,6 +91,7 @@ namespace BankApp
             input = Console.ReadLine().Trim().ToLower();
             while (String.IsNullOrWhiteSpace(input) || !input.All(char.IsAsciiDigit))
             {
+                Console.Clear();
                 Console.WriteLine("Bad input, please try again.");
                 Console.Write("Please Enter ID");
                 input = Console.ReadLine().Trim().ToLower();
@@ -114,6 +101,7 @@ namespace BankApp
 
         static Customer MakeCustomer()
         {
+            Console.Clear();
             int numFieldsCorrect = 0;
             Console.WriteLine("Please Type In New Customer Information");
             string ssn = String.Empty;
@@ -125,9 +113,9 @@ namespace BankApp
             string zip = String.Empty;
             while (numFieldsCorrect < 3)
             {
-                Console.Write("Please Type in 9 digit SSN: ");
+                Console.Write("Please Type in 9 digit SSN (NUMBERS ONLY): ");
                 ssn = Console.ReadLine();
-                if(Regex.IsMatch(ssn, @"^\d{9}|\d{3}-\d{2}-\d{4}$"))
+                if(Regex.IsMatch(ssn, @"^\d{9}$"))
                 {
                     numFieldsCorrect++;
                 }
@@ -178,6 +166,11 @@ namespace BankApp
                 }
             }
             return new Customer(0, ssn, forename, lastName, streetAddress, city, state, zip);
+        }
+        static void KeyInterrupt()
+        {
+            Console.WriteLine("Press any key to continue...");
+            Console.ReadKey();
         }
     }
 }
