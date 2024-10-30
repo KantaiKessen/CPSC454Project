@@ -1,5 +1,6 @@
 ﻿using Microsoft.Data.SqlClient;
 using System;
+using System.Text.RegularExpressions;
 
 namespace BankApp
 {
@@ -20,20 +21,26 @@ namespace BankApp
                 switch (input)
                 {
                     case "1":
-
+                        Console.Clear();
                         dbconnect.GetCustomers();
+                        KeyInterrupt();
                         break;
 
                     case "2":
-
+                        Console.Clear();
                         dbconnect.GetAccounts();
+                        KeyInterrupt();
                         break;
 
                     case "3":
+                        Console.Clear();
                         dbconnect.GetCustomerByCustID(GetIntegerID());
+                        KeyInterrupt();
                         break;
                     case "4":
+                        Console.Clear();
                         dbconnect.GetAccountByAccID(GetIntegerID());
+                        KeyInterrupt();
                         break;
                     case "5":
                         break;
@@ -58,13 +65,12 @@ namespace BankApp
                         KeyInterrupt();
                         break;
                     case "x":
-                        {
-                            Console.WriteLine("Please select a valid option!");
-                            break;
-                        }
-
-                    default:
                         break;
+                    default:
+                    {
+                        Console.WriteLine("Please select a valid option!");
+                        break;
+                    }
                 }
             } while (input != "x");
             Console.WriteLine("Exiting . . .");
@@ -86,15 +92,17 @@ namespace BankApp
             Console.WriteLine("8. Deposit");
             Console.WriteLine("9. Withdraw");
             Console.WriteLine("x. Exit");
+            Console.Write("> ");
         }
 
         static string GetIntegerID()
         {
             string input;
-            Console.Write("Please Enter ID");
+            Console.Write("Please Enter ID: ");
             input = Console.ReadLine().Trim().ToLower();
             while (String.IsNullOrWhiteSpace(input) || !input.All(char.IsAsciiDigit))
             {
+                Console.Clear();
                 Console.WriteLine("Bad input, please try again.");
                 Console.Write("Please Enter ID");
                 input = Console.ReadLine().Trim().ToLower();
