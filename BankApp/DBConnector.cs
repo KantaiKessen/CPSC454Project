@@ -153,9 +153,9 @@ namespace BankApp
             PrintData(data);
         }
 
-        public void GetAccountByAccID(string account)
+        public void GetAccountByAccID(string accountid)
         {
-            string query = $"SELECT * FROM customer WHERE account_id = {account};";
+            string query = $"SELECT * FROM account WHERE account_id = {accountid};";
             List<List<string>> data = GetData(query);
             Console.WriteLine($"All Accounts: ");
             PrintData(data);

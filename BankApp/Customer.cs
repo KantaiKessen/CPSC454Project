@@ -23,12 +23,10 @@ namespace BankApp
         = String.Empty;
         public string ZIP { get; set; }
         = String.Empty;
-        public string ZIP_4 { get; set; }
-        = String.Empty;
 
         public Customer(int customer_id, string SSN, string Forename,
             string Last_name, string Street_address, string City, string State,
-            string ZIP, string ZIP_4)
+            string ZIP)
         {
             this.customer_id = customer_id;
             this.SSN = SSN;
@@ -38,15 +36,14 @@ namespace BankApp
             this.City = City;
             this.State = State;
             this.ZIP = ZIP;
-            this.ZIP_4 = ZIP_4;
         }
 
         public string ToInsertString()
         {
             return $"INSERT INTO customer(" +
-                $"ssn, forename, last_name, street_address, city, state, zip, zip_4) " +
+                $"ssn, forename, last_name, street_address, city, state, zip) " +
                 $"VALUES ('{SSN}','{Forename}','{Last_name}'," +
-                $"'{Street_address}','{City}','{State}','{ZIP}','{ZIP_4}');";
+                $"'{Street_address}','{City}','{State}','{ZIP}');";
         }
     }
 }
