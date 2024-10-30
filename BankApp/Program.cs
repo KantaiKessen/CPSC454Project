@@ -15,6 +15,7 @@ namespace BankApp
                 Console.Clear();
                 DisplayOptions();
                 input = Console.ReadLine().Trim().ToLower();
+                List<string> transactions = new List<string>;
 
                 switch (input)
                 {
@@ -33,6 +34,28 @@ namespace BankApp
                         break;
                     case "4":
                         dbconnect.GetAccountByAccID(GetIntegerID());
+                        break;
+                    case "5":
+                        break;
+                    case "6":
+                        Console.Clear();
+                        transactions.Clear();
+                        Customer newCustomer = MakeCustomer();
+                        transactions.Add(newCustomer.ToInsertString());
+                        dbconnect.ExecuteSqlTransaction(transactions);
+                        KeyInterrupt();
+                        break;
+                    case "7":
+                        Console.Clear();
+                        transactions.Clear();
+                        Account newAccount = MakeAccount();
+                        transactions.AddRange(newAccount.ToInsertStrings());
+                        dbconnect.ExecuteSqlTransaction(transactions);
+                        KeyInterrupt();
+                        break;
+                    case "8":
+                        Console.Clear();
+                        KeyInterrupt();
                         break;
                     case "x":
                         {
@@ -78,7 +101,149 @@ namespace BankApp
             }
             return input;
         }
+
+        static Customer MakeCustomer()
+        {
+            Console.Clear();
+            int numFieldsCorrect = 0;
+            Console.WriteLine("Please Type In New Customer Information");
+            string ssn = String.Empty;
+            string forename = String.Empty;
+            string lastName = String.Empty;
+            string streetAddress = String.Empty;
+            string city = String.Empty;
+            string state = String.Empty;
+            string zip = String.Empty;
+            while (numFieldsCorrect < 3)
+            {
+                Console.Write("Please Type in 9 digit SSN (NUMBERS ONLY): ");
+                ssn = Console.ReadLine();
+                if(Regex.IsMatch(ssn, @"^\d{9}$"))
+                {
+                    numFieldsCorrect++;
+                }
+                else
+                {
+                    Console.WriteLine("Incorrect Format!");
+                    numFieldsCorrect = 0;
+                    continue;
+                }
+                Console.Write("Please reenter to confirm: ");
+                if (Console.ReadLine() != ssn)
+                {
+                    Console.WriteLine("SSN does not match, restarting account creation.");
+                    numFieldsCorrect = 0;
+                    continue;
+                }
+                Console.Write("Please Type in Forename: ");
+                forename = Console.ReadLine();
+                Console.Write("Last Name: ");
+                lastName = Console.ReadLine();
+                Console.Write("Street Address: ");
+                streetAddress = Console.ReadLine();
+                Console.Write("City: ");
+                city = Console.ReadLine();
+                Console.Write("State (2 letter capitalized): ");
+                state = Console.ReadLine();
+                if (Regex.IsMatch(state, @"^[A-Z]{2}$"))
+                {
+                    numFieldsCorrect++;
+                }
+                else
+                {
+                    Console.WriteLine("The State input had incorrect format.");
+                    numFieldsCorrect = 0;
+                    continue;
+                }
+                Console.Write("ZIP (5 digits): ");
+                zip = Console.ReadLine();
+                if (Regex.IsMatch(zip, @"^\d{5}$"))
+                {
+                    numFieldsCorrect++;
+                }
+                else
+                {
+                    Console.WriteLine("Wrong Zip Format!");
+                    numFieldsCorrect = 0;
+                    continue;
+                }
+            }
+            return new Customer(0, ssn, forename, lastName, streetAddress, city, state, zip);
+        }
+        static void KeyInterrupt()
+        {
+            Console.WriteLine("Press any key to continue...");
+            Console.ReadKey();
+        }
+
+        static Customer MakeAccount()
+        {
+            Console.Clear();
+            int numFieldsCorrect = 0;
+            Console.WriteLine("Please Type In New Customer Information");
+            int customerID = -1;
+            string accountType = string.Empty;
+            decimal balance = 0;
+            while (numFieldsCorrect < 3)
+            {
+                Console.Write("Please Type in 9 digit SSN (NUMBERS ONLY): ");
+                ssn = Console.ReadLine();
+                if (Regex.IsMatch(ssn, @"^\d{9}$"))
+                {
+                    numFieldsCorrect++;
+                }
+                else
+                {
+                    Console.WriteLine("Incorrect Format!");
+                    numFieldsCorrect = 0;
+                    continue;
+                }
+                Console.Write("Please reenter to confirm: ");
+                if (Console.ReadLine() != ssn)
+                {
+                    Console.WriteLine("SSN does not match, restarting account creation.");
+                    numFieldsCorrect = 0;
+                    continue;
+                }
+                Console.Write("Please Type in Forename: ");
+                forename = Console.ReadLine();
+                Console.Write("Last Name: ");
+                lastName = Console.ReadLine();
+                Console.Write("Street Address: ");
+                streetAddress = Console.ReadLine();
+                Console.Write("City: ");
+                city = Console.ReadLine();
+                Console.Write("State (2 letter capitalized): ");
+                state = Console.ReadLine();
+                if (Regex.IsMatch(state, @"^[A-Z]{2}$"))
+                {
+                    numFieldsCorrect++;
+                }
+                else
+                {
+                    Console.WriteLine("The State input had incorrect format.");
+                    numFieldsCorrect = 0;
+                    continue;
+                }
+                Console.Write("ZIP (5 digits): ");
+                zip = Console.ReadLine();
+                if (Regex.IsMatch(zip, @"^\d{5}$"))
+                {
+                    numFieldsCorrect++;
+                }
+                else
+                {
+                    Console.WriteLine("Wrong Zip Format!");
+                    numFieldsCorrect = 0;
+                    continue;
+                }
+            }
+            return new Customer(0, ssn, forename, lastName, streetAddress, city, state, zip);
+        }
+        static void KeyInterrupt()
+        {
+            Console.WriteLine("Press any key to continue...");
+            Console.ReadKey();
+        }
     }
-
-
 }
