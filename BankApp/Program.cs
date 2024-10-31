@@ -6,7 +6,7 @@ namespace BankApp
 {
     internal class Program
     {
-        const string versionNumber = "version 0.02 build 20241030";
+        const string versionNumber = "version 0.03 build 20241031";
         static void Main()
         {
             string input;
@@ -43,6 +43,9 @@ namespace BankApp
                         KeyInterrupt();
                         break;
                     case "5":
+                        Console.Clear();
+                        dbconnect.GetCustomerAccounts(GetIntegerID());
+                        KeyInterrupt();
                         break;
                     case "6":
                         Console.Clear();
@@ -56,16 +59,24 @@ namespace BankApp
                         Console.Clear();
                         transactions.Clear();
                         Account newAccount = MakeAccount();
-                        transactions.AddRange(newAccount.ToInsertStrings());
-                        foreach (string s in  transactions)
-                        {
-                            Console.WriteLine(s);
-                        }  
+                        transactions.AddRange(newAccount.ToInsertStrings()); 
                         dbconnect.ExecuteSqlTransaction(transactions);
                         KeyInterrupt();
                         break;
                     case "8":
                         Console.Clear();
+                        transactions.Clear();
+                        Transaction creditTransaction = MakeTransaction("Credit");
+                        transactions.AddRange(creditTransaction.ToTransactions());
+                        dbconnect.ExecuteSqlTransaction(transactions);
+                        KeyInterrupt();
+                        break;
+                    case "9":
+                        Console.Clear();
+                        transactions.Clear();
+                        Transaction debitTransaction = MakeTransaction("Debit");
+                        transactions.AddRange(debitTransaction.ToTransactions());
+                        dbconnect.ExecuteSqlTransaction(transactions);
                         KeyInterrupt();
                         break;
                     case "x":
@@ -90,7 +101,7 @@ namespace BankApp
             Console.WriteLine("2. View accounts");
             Console.WriteLine("3. Select customer by customer id");
             Console.WriteLine("4. Select account by account id");
-            Console.WriteLine("5. View accounts by customer");
+            Console.WriteLine("5. View accounts by customer id");
             Console.WriteLine("6. Add customer");
             Console.WriteLine("7. Add account");
             Console.WriteLine("8. Deposit");
@@ -237,9 +248,61 @@ namespace BankApp
                 }
                 Console.WriteLine("Error, please try again.");
             }
-
-
             return new Account(customerID, accountType, balance);
+        }
+
+        static Transaction MakeTransaction(string type)
+        {
+            int accountID = 0;
+            int accountIDVerif = -1;
+            decimal credit = 0.00m;
+            decimal debit = 0.00m;
+            Console.Clear();
+            do
+            {
+                Console.Write("Please type in account ID: ");
+                if (!Int32.TryParse(Console.ReadLine(), out accountID))
+                {
+                    Console.WriteLine("Invalid input. Amount must be an account ID");
+                    continue;
+                }
+                Console.Write("Please verify account ID: ");
+                if (!Int32.TryParse(Console.ReadLine(), out accountIDVerif))
+                {
+                    Console.WriteLine("Invalid input. Amount must be an account ID");
+                    continue;
+                }
+            }
+            while (accountID != accountIDVerif);
+            if (type == "Credit")
+            {
+                while (credit < 0.01m)
+                {
+                    Console.Write("Please type in amount to credit: ");
+                    if (!Decimal.TryParse(Console.ReadLine(), out credit))
+                    {
+                        Console.WriteLine("Invalid input. Amount must be positive and a number.");
+                        credit = 0.00m;
+                    }
+                }
+            }
+            else if (type == "Debit")
+            {
+                while (debit < 0.01m)
+                {
+                    Console.Write("Please type in amount to debit: ");
+                    if (!Decimal.TryParse(Console.ReadLine(), out debit))
+                    {
+                        Console.WriteLine("Invalid input. Amount must be positive and a number.");
+                        debit = 0.00m;
+                    }
+                }
+            }
+            else
+            {
+                throw new ArgumentException("Please supply a valid argument.");
+            }
+            return new Transaction(accountID, credit, debit);
         }
     }
 }
