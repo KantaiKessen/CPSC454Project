@@ -163,11 +163,11 @@ namespace BankApp
 
         public void GetCustomerAccounts(string customer)
         {
-            string query = $"select c.customer_id, c.forename, c.last_name " +
-                $"from customer as c " +
-                $"left join account as a " +
-                $"on c.customer_id = a.customer_id;" +
-                $"where c.customer_id = {customer} ";
+            string query = $"select c.customer_id, c.forename, c.last_name, a.account_id, a.balance " +
+                $"FROM customer AS c " +
+                $"LEFT JOIN account AS a " +
+                $"ON c.customer_id = a.customer_id " +
+                $"WHERE c.customer_id = {Int32.Parse(customer)};";
             List<List<string>> data = GetData(query);
             Console.WriteLine($"All Accounts: ");
             PrintData(data);
