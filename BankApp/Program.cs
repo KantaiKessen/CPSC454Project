@@ -6,7 +6,7 @@ namespace BankApp
 {
     internal class Program
     {
-        const string versionNumber = "version 0.03 build 20241031";
+        const string versionNumber = "version 0.04 build 20241123";
         static void Main()
         {
             string input;
@@ -110,7 +110,7 @@ namespace BankApp
             Console.Write("> ");
         }
 
-        static string GetIntegerID()
+        static int GetIntegerID()
         {
             string input;
             Console.Write("Please Enter ID: ");
@@ -122,7 +122,7 @@ namespace BankApp
                 Console.Write("Please Enter ID");
                 input = Console.ReadLine().Trim().ToLower();
             }
-            return input;
+            return int.Parse(input);
         }
 
         static Customer MakeCustomer()
