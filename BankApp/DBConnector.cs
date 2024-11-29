@@ -28,16 +28,66 @@ namespace BankApp
             Console.WriteLine("End of Data\n\n");
         }
 
+        public void TestConnection()
+        {
+            using (var connection = new SqlConnection(connectionString))
+            {
+                try
+                {
+                    connection.Open();
+                    Console.WriteLine("Connection successful");
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine("Exception Type: {0}", ex.GetType());
+                    Console.WriteLine("Message: {0}", ex.Message);
+                }
+            }
+        }
+
         private List<List<string>> ExecuteQuery(string query, Dictionary<string, object> parameters = null)
         {
             var data = new List<List<string>>();
 
             using (var connection = new SqlConnection(connectionString))
             {
-                try
+                connection.Open();
+                using (var command = new SqlCommand(query, connection))
                 {
-                    connection.Open();
-                    using (var command = new SqlCommand(query, connection))
+                    if (parameters != null)
+                    {
+                        foreach (var param in parameters)
+                        {
+                            command.Parameters.Add(param.Key, GetSqlDbType(param.Value)).Value = param.Value;
+                        }
+                    }
+
+                    using (var reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            var datum = new List<string>();
+                            for (int i = 0; i < reader.FieldCount; i++)
+                            {
+                                var row = $"{reader.GetName(i)}: {reader.GetValue(i)}";
+                                datum.Add(row);
+                            }
+                            data.Add(datum);
+                        }
+                    }
+                }
+            }
+            return data;
+        }
+
+        public void ExecuteSqlCommand(string sqlstring, Dictionary<string, object> parameters = null)
+        {
+            using (var connection = new SqlConnection(connectionString))
+            {
+                connection.Open();
+                using (var command = new SqlCommand(sqlstring, connection))
+                {
+                    try
                     {
                         if (parameters != null)
                         {
@@ -47,33 +97,65 @@ namespace BankApp
                             }
                         }
 
-                        using (var reader = command.ExecuteReader())
+                        command.ExecuteNonQuery();
+                        Console.WriteLine("Command executed successfully");
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine("Exception Type: {0}", ex.GetType());
+                        Console.WriteLine("Message: {0}", ex.Message);
+                    }
+                }
+            }
+        }
+
+        public void ExecuteSqlCommands(List<string> sqlstrings, List<Dictionary<string, object>> parameters = null)
+        {
+            using (var connection = new SqlConnection(connectionString))
+            {
+                connection.Open();
+                using (var command = connection.CreateCommand())
+                {
+                    using (var transaction = connection.BeginTransaction())
+                    {
+                        command.Transaction = transaction;
+                        try
                         {
-                            while (reader.Read())
+                            for (int i = 0; i < sqlstrings.Count; i++)
                             {
-                                var datum = new List<string>();
-                                for (int i = 0; i < reader.FieldCount; i++)
+                                command.CommandText = sqlstrings[i];
+                                if (parameters != null)
                                 {
-                                    var row = $"{reader.GetName(i)}: {reader.GetValue(i)}";
-                                    datum.Add(row);
+                                    foreach (var param in parameters[i])
+                                    {
+                                        command.Parameters.Add(param.Key, GetSqlDbType(param.Value)).Value = param.Value;
+                                    }
                                 }
-                                data.Add(datum);
+                                command.ExecuteNonQuery();
+                                command.Parameters.Clear();
+                            }
+                            transaction.Commit();
+                            Console.WriteLine("Commands executed successfully");
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine("Exception Type: {0}", ex.GetType());
+                            Console.WriteLine("Message: {0}", ex.Message);
+                            try
+                            {
+                                transaction.Rollback();
+                            }
+                            catch (Exception ex2)
+                            {
+                                Console.WriteLine("Exception Type: {0}", ex2.GetType());
+                                Console.WriteLine("Message: {0}", ex2.Message);
                             }
                         }
                     }
                 }
-                catch (Exception ex)
-                {
-                    Console.WriteLine("Exception Type: {0}", ex.GetType());
-                    Console.WriteLine("Message: {0}", ex.Message);
-                }
-                finally
-                {
-                    connection.Close();
-                }
             }
-            return data;
         }
+
 
         public void GetCustomers()
         {
@@ -131,38 +213,6 @@ namespace BankApp
             PrintData(data);
         }
 
-        public void ExecuteSqlTransaction(List<string> commands)
-        {
-            using (var connection = new SqlConnection(connectionString))
-            {
-                connection.Open();
-                using (var transaction = connection.BeginTransaction())
-                using (var command = connection.CreateCommand())
-                {
-                    command.Connection = connection;
-                    command.Transaction = transaction;
-
-                    try
-                    {
-                        foreach (var transact in commands)
-                        {
-                            command.CommandText = transact;
-                            command.ExecuteNonQuery();
-                        }
-
-                        transaction.Commit();
-                        Console.WriteLine("Transaction successful");
-                    }
-                    catch (Exception ex)
-                    {
-                        Console.WriteLine("Exception Type: {0}", ex.GetType());
-                        Console.WriteLine("Message: {0}", ex.Message);
-                        transaction.Rollback();
-                    }
-                }
-            }
-        }
-
         private SqlDbType GetSqlDbType(object value)
         {
             return value switch
@@ -171,7 +221,8 @@ namespace BankApp
                 string _ => SqlDbType.NVarChar,
                 DateTime _ => SqlDbType.DateTime,
                 bool _ => SqlDbType.Bit,
-                // Add mappings as needed
+                float _ => SqlDbType.Float,
+                decimal _ => SqlDbType.Decimal,
                 _ => SqlDbType.Variant
             };
         }
