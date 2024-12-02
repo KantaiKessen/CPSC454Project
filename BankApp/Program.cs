@@ -76,6 +76,11 @@ namespace BankApp
                         dbconnect.ExecuteSqlCommands(debitTransaction.ToTransactionStrings(), debitTransaction.ToTransactionDictionaries());
                         KeyInterrupt();
                         break;
+                    case "10":
+                        Console.Clear();
+                        TransferFunds(dbconnect);
+                        KeyInterrupt();
+                        break;
                     case "x":
                         break;
                     default:
@@ -122,10 +127,38 @@ namespace BankApp
             return int.Parse(input);
         }
 
+        static decimal GetDecimalAmount()
+        {
+            string input;
+            Console.Write("Please Enter Amount: ");
+            input = Console.ReadLine().Trim().ToLower();
+            while (String.IsNullOrWhiteSpace(input) || !Regex.IsMatch(input, @"^\d+\.\d{0,2}$"))
+            {
+                Console.Clear();
+                Console.WriteLine("Bad input, please try again.");
+                Console.Write("Please Enter Amount: ");
+                input = Console.ReadLine().Trim().ToLower();
+            }
+            return decimal.Parse(input);
+        }
+
         static void KeyInterrupt()
         {
             Console.WriteLine("Press any key to continue...");
             Console.ReadKey();
+        }
+
+        static void TransferFunds(DBConnector dbconnect)
+        {
+            Console.Clear();
+            Console.WriteLine("Transfer funds");
+            Console.WriteLine("Please select an account to transfer funds from:");
+            int fromAccount = GetIntegerID();
+            Console.WriteLine("Please select an account to transfer funds to:");
+            int toAccount = GetIntegerID();
+            Console.WriteLine("Please enter the amount to transfer:");
+            decimal amount = GetDecimalAmount();
+            dbconnect.TransferFunds(fromAccount, toAccount, amount);
         }
     }
 }

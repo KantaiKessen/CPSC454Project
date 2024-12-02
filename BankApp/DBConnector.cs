@@ -213,6 +213,43 @@ namespace BankApp
             PrintData(data);
         }
 
+        public void TransferFunds(int fromAccountId, int toAccountId, decimal amount)
+        {
+            List<string> queries = new List<string>()
+            {
+                "UPDATE account SET balance -= @Amount WHERE account_id = @FromAccountId;",
+                "UPDATE account SET balance += @Amount WHERE account_id = @ToAccountId;",
+                "INSERT INTO \"transaction\" (account_id, credit, debit) VALUES (@FromAccountId, 0, @Amount);",
+                "INSERT INTO \"transaction\" (account_id, credit, debit) VALUES (@ToAccountId, @Amount, 0);"
+            };
+
+            List<Dictionary<String, Object>> parameterList = new List<Dictionary<String, Object>>()
+            {
+                new Dictionary<String, Object>
+                {
+                    { "@Amount", amount },
+                    { "@FromAccountId", fromAccountId }
+                },
+                new Dictionary<String, Object>
+                {
+                    { "@Amount", amount },
+                    { "@ToAccountId", toAccountId }
+                },
+                new Dictionary<String, Object>
+                {
+                    { "@Amount", amount },
+                    { "@FromAccountId", fromAccountId }
+                },
+                new Dictionary<String, Object>
+                {
+                    { "@Amount", amount },
+                    { "@ToAccountId", toAccountId }
+                }
+            };
+
+            ExecuteSqlCommands(queries, parameterList);
+        }
+
         private SqlDbType GetSqlDbType(object value)
         {
             return value switch
